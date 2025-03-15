@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "66939842634",
+    "project_id": "qmsys-8425f",
+    "storage_bucket": "qmsys-8425f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66939842634:android:962366851519e26e78f6b3",
+        "android_client_info": {
+          "package_name": "com.dgmsolutions.qms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5Prhz4qjg-A6fLXee2ggSkc2Jybcjn6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
