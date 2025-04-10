@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:qms/screens/navigation_wrapper.dart';
+import 'package:qms/screens/menu_screen.dart';
+import 'package:qms/screens/display_screen.dart';
+import 'package:qms/screens/admin_panel.dart';
+import 'package:qms/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +30,7 @@ class QueueApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Roboto',
       ),
-      home: const NavigationWrapper(),
+      home: NavigationWrapper(),
     );
   }
 }

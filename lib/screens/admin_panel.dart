@@ -23,11 +23,12 @@ class _AdminPanelState extends State<AdminPanel> {
       });
 
       // Mark the selected number as called in the waiting collection
-      var waitingSnapshot = await _firestore
-          .collection('waiting')
-          .where('number', isEqualTo: number)
-          .limit(1)
-          .get();
+      var waitingSnapshot =
+          await _firestore
+              .collection('waiting')
+              .where('number', isEqualTo: number)
+              .limit(1)
+              .get();
 
       if (waitingSnapshot.docs.isNotEmpty) {
         await waitingSnapshot.docs.first.reference.update({
@@ -36,13 +37,13 @@ class _AdminPanelState extends State<AdminPanel> {
         });
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Number #$number called')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Number #$number called')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -67,13 +68,41 @@ class _AdminPanelState extends State<AdminPanel> {
         await doc.reference.delete();
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Queue reset to 0')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Queue reset to 0')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _cancal(int currentNumber) async {
+    setState(() => _isLoading = true);
+    try {
+      var queueDoc =
+          await _firestore
+              .collection('waiting')
+              .where('number', isEqualTo: currentNumber)
+              .limit(1)
+              .get();
+
+      if (queueDoc.docs.isNotEmpty) {
+        await queueDoc.docs.first.reference.update({
+          'status': 'canceled',
+          'calledTimestamp': FieldValue.serverTimestamp(),
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Number #$currentNumber is cancelled')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -84,7 +113,7 @@ class _AdminPanelState extends State<AdminPanel> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Queue Control',
+          'Medical Center',
           style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.blue.shade700,
@@ -103,7 +132,8 @@ class _AdminPanelState extends State<AdminPanel> {
             ),
             const SizedBox(height: 20),
             StreamBuilder<DocumentSnapshot>(
-              stream: _firestore.collection('called').doc('current').snapshots(),
+              stream:
+                  _firestore.collection('called').doc('current').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData || !snapshot.data!.exists) {
                   return Text(
@@ -115,9 +145,12 @@ class _AdminPanelState extends State<AdminPanel> {
                     ),
                   );
                 }
-                int currentNumber = snapshot.data!.data() != null
-                    ? (snapshot.data!.data() as Map<String, dynamic>)['number'] ?? 0
-                    : 0;
+                int currentNumber =
+                    snapshot.data!.data() != null
+                        ? (snapshot.data!.data()
+                                as Map<String, dynamic>)['number'] ??
+                            0
+                        : 0;
                 return Text(
                   'Current Called: #$currentNumber',
                   style: GoogleFonts.roboto(
@@ -131,10 +164,11 @@ class _AdminPanelState extends State<AdminPanel> {
             const SizedBox(height: 20),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('waiting')
-                    .orderBy('timestamp')
-                    .snapshots(),
+                stream:
+                    _firestore
+                        .collection('waiting')
+                        .orderBy('timestamp')
+                        .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -143,9 +177,7 @@ class _AdminPanelState extends State<AdminPanel> {
                   var waitingList = snapshot.data!.docs;
 
                   if (waitingList.isEmpty) {
-                    return const Center(
-                      child: Text('No numbers issued yet'),
-                    );
+                    return const Center(child: Text('No numbers issued yet'));
                   }
 
                   return ListView.builder(
@@ -154,7 +186,7 @@ class _AdminPanelState extends State<AdminPanel> {
                       int number = waitingList[index]['number'];
                       String status = waitingList[index]['status'];
                       bool isCalled = status == 'called';
-
+                      bool isCanceled = status == 'canceled';
                       return ListTile(
                         title: Text(
                           '#$number',
@@ -163,17 +195,36 @@ class _AdminPanelState extends State<AdminPanel> {
                             color: isCalled ? Colors.grey : Colors.black,
                           ),
                         ),
-                        trailing: ElevatedButton(
-                          onPressed: _isLoading || isCalled
-                              ? null
-                              : () => _callNumber(number),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade700,
-                          ),
-                          child: Text(
-                            'Call',
-                            style: GoogleFonts.roboto(color: Colors.white),
-                          ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ElevatedButton(
+                              onPressed:
+                                  _isLoading || isCalled || isCanceled
+                                      ? null
+                                      : () => _callNumber(number),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue.shade700,
+                              ),
+                              child: Text(
+                                'Call',
+                                style: GoogleFonts.roboto(color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed:
+                                  _isLoading || isCanceled || isCalled
+                                      ? null
+                                      : () => _cancal(number),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                              ),
+                              child: Text(
+                                'Cancel',
+                                style: GoogleFonts.roboto(color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -185,20 +236,20 @@ class _AdminPanelState extends State<AdminPanel> {
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : ElevatedButton.icon(
-              onPressed: _resetQueue,
-              icon: const Icon(Icons.refresh),
-              label: Text(
-                'Reset Queue',
-                style: GoogleFonts.roboto(fontSize: 16),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
+                  onPressed: _resetQueue,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(
+                    'Reset Queue',
+                    style: GoogleFonts.roboto(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
+                    backgroundColor: Colors.red.shade700,
+                  ),
                 ),
-                backgroundColor: Colors.red.shade700,
-              ),
-            ),
           ],
         ),
       ),

@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:qms/screens/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String label;
+
+  const HomeScreen({Key? key, required this.label}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = false;
   Timer? _timer;
   int? _remainingSeconds;
-
+  bool _isCalled = false;
   Future<void> _takeNumber() async {
     if (_hasTakenNumber) return;
 
@@ -49,13 +52,38 @@ class _HomeScreenState extends State<HomeScreen> {
         _hasTakenNumber = true;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<bool> _cancal() async {
+    try {
+      var queueDoc =
+          await _firestore
+              .collection('waiting')
+              .where('number', isEqualTo: currentNumber)
+              .limit(1)
+              .get();
+
+      if (queueDoc.docs.isNotEmpty) {
+        await queueDoc.docs.first.reference.update({
+          'status': 'canceled',
+          'calledTimestamp': FieldValue.serverTimestamp(),
+        });
+        return true;
+      }
+      return true;
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      return false;
     }
   }
 
@@ -111,6 +139,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
+              Text(
+                'Label: ${widget.label}',
+                style: GoogleFonts.roboto(
+                  fontSize: 24,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 40),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -130,10 +167,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     if (currentNumber != null && _waitingDocId != null)
                       StreamBuilder<DocumentSnapshot>(
-                        stream: _firestore
-                            .collection('waiting')
-                            .doc(_waitingDocId)
-                            .snapshots(),
+                        stream:
+                            _firestore
+                                .collection('waiting')
+                                .doc(_waitingDocId)
+                                .snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData || !snapshot.data!.exists) {
                             return Column(
@@ -157,14 +195,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(height: 20),
                                 const Text(
                                   'Calculating wait time...',
-                                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ],
                             );
                           }
 
                           String status = snapshot.data!['status'];
-                          bool isCalled = status == 'called';
+                          _isCalled = status == 'called';
 
                           return Column(
                             children: [
@@ -185,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              if (isCalled)
+                              if (_isCalled)
                                 Text(
                                   'Your turn!',
                                   style: GoogleFonts.roboto(
@@ -196,10 +237,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 )
                               else
                                 StreamBuilder<QuerySnapshot>(
-                                  stream: _firestore
-                                      .collection('waiting')
-                                      .where('status', isEqualTo: 'waiting')
-                                      .snapshots(),
+                                  stream:
+                                      _firestore
+                                          .collection('waiting')
+                                          .where('status', isEqualTo: 'waiting')
+                                          .snapshots(),
                                   builder: (context, waitSnapshot) {
                                     if (!waitSnapshot.hasData) {
                                       return Column(
@@ -221,20 +263,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                       );
                                     }
 
-                                    int totalWaiting = waitSnapshot.data!.docs.length;
-                                    int numbersAhead = totalWaiting - 1; // Exclude user's number
+                                    int totalWaiting =
+                                        waitSnapshot.data!.docs.length;
+                                    int numbersAhead =
+                                        totalWaiting -
+                                        1; // Exclude user's number
                                     if (numbersAhead < 0) numbersAhead = 0;
-                                    const int secondsPerNumber = 600; // 15 min = 900 sec
-                                    int initialWaitTimeSeconds = numbersAhead * secondsPerNumber;
+                                    const int secondsPerNumber =
+                                        600; // 15 min = 900 sec
+                                    int initialWaitTimeSeconds =
+                                        numbersAhead * secondsPerNumber;
 
                                     // Start or update the countdown timer
-                                    if (_remainingSeconds == null || _remainingSeconds! > initialWaitTimeSeconds) {
+                                    if (_remainingSeconds == null ||
+                                        _remainingSeconds! >
+                                            initialWaitTimeSeconds) {
                                       _startCountdown(initialWaitTimeSeconds);
                                     }
 
-                                    double progressValue = _remainingSeconds != null && initialWaitTimeSeconds > 0
-                                        ? _remainingSeconds! / initialWaitTimeSeconds
-                                        : 1.0;
+                                    double progressValue =
+                                        _remainingSeconds != null &&
+                                                initialWaitTimeSeconds > 0
+                                            ? _remainingSeconds! /
+                                                initialWaitTimeSeconds
+                                            : 1.0;
 
                                     return Column(
                                       children: [
@@ -255,16 +307,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                               child: CircularProgressIndicator(
                                                 value: progressValue,
                                                 strokeWidth: 6,
-                                                backgroundColor: Colors.grey.shade300,
-                                                valueColor: AlwaysStoppedAnimation<Color>(
-                                                  Colors.green.shade700,
-                                                ),
+                                                backgroundColor:
+                                                    Colors.grey.shade300,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                      Color
+                                                    >(Colors.green.shade700),
                                               ),
                                             ),
                                             Text(
                                               _remainingSeconds != null
-                                                  ? _formatTime(_remainingSeconds!)
-                                                  : _formatTime(initialWaitTimeSeconds),
+                                                  ? _formatTime(
+                                                    _remainingSeconds!,
+                                                  )
+                                                  : _formatTime(
+                                                    initialWaitTimeSeconds,
+                                                  ),
                                               style: GoogleFonts.roboto(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.bold,
@@ -304,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           backgroundColor:
-                          _hasTakenNumber ? Colors.grey : Colors.blue,
+                              _hasTakenNumber ? Colors.grey : Colors.blue,
                         ),
                         child: Text(
                           _hasTakenNumber ? 'Number Taken' : 'Take Number',
@@ -315,6 +373,44 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
+                    SizedBox(height: 4),
+                    ElevatedButton(
+                      onPressed: () async {
+                        bool isCanceled = await _cancal();
+
+                        if (isCanceled) {
+                          _hasTakenNumber = false;
+                          _timer?.cancel();
+
+                          _isCalled = false;
+                          Navigator.pop(context);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error in update data')),
+                          );
+                        }
+                      },
+
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 70,
+                          vertical: 15,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        backgroundColor:
+                            _hasTakenNumber ? Colors.red : Colors.grey,
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.roboto(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
