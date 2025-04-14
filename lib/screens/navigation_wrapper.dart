@@ -29,10 +29,13 @@ class _NavigationWrapperState extends State<NavigationWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body:
+          _selectedIndex == 3
+              ? const HomeScreen() // When the MenuScreen is selected, show it separately
+              : _screens[_selectedIndex], // Show the selected screen for navigation,
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Menu'),
           BottomNavigationBarItem(
             icon: Icon(Icons.display_settings),
             label: 'Display',

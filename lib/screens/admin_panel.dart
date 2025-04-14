@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminPanel extends StatefulWidget {
   const AdminPanel({super.key});
@@ -52,6 +53,12 @@ class _AdminPanelState extends State<AdminPanel> {
   Future<void> _resetQueue() async {
     setState(() => _isLoading = true);
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      prefs.remove('currentNumber');
+      prefs.remove('waitingDocId');
+      prefs.remove('priority');
+      prefs.remove('label');
       // Reset both queue and called numbers to 0
       await _firestore.collection('queue').doc('current').set({
         'number': 0,
@@ -167,6 +174,7 @@ class _AdminPanelState extends State<AdminPanel> {
                 stream:
                     _firestore
                         .collection('waiting')
+                        .orderBy('priority', descending: true)
                         .orderBy('timestamp')
                         .snapshots(),
                 builder: (context, snapshot) {
@@ -185,16 +193,36 @@ class _AdminPanelState extends State<AdminPanel> {
                     itemBuilder: (context, index) {
                       int number = waitingList[index]['number'];
                       String status = waitingList[index]['status'];
+                      String label = waitingList[index]['label'];
+                      int priority = waitingList[index]['priority'];
                       bool isCalled = status == 'called';
                       bool isCanceled = status == 'canceled';
                       return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor:
+                              priority == 1
+                                  ? Colors.red
+                                  : Colors.blue, // rouge si urgent
+                          child: Text(
+                            '#${index + 1}',
+                          ), // numéro d'ordre dans la liste
+                        ),
+
                         title: Text(
-                          '#$number',
+                          '\nLabel: $label',
                           style: GoogleFonts.roboto(
                             fontSize: 16,
                             color: isCalled ? Colors.grey : Colors.black,
                           ),
                         ),
+
+                        /* Text(
+                          '#$number',
+                          style: GoogleFonts.roboto(
+                            fontSize: 16,
+                            color: isCalled ? Colors.grey : Colors.black,
+                          ),
+                        ), */
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

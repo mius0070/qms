@@ -8,7 +8,7 @@ import 'package:qms/screens/menu_screen.dart';
 class HomeScreen extends StatefulWidget {
   final String label;
 
-  const HomeScreen({Key? key, required this.label}) : super(key: key);
+  const HomeScreen({Key? key, this.label = ""}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int? _remainingSeconds;
   bool _isCalled = false;
   Future<void> _takeNumber() async {
+    var docRef;
     if (_hasTakenNumber) return;
 
     setState(() {
@@ -39,12 +40,23 @@ class _HomeScreenState extends State<HomeScreen> {
         'number': newNumber,
         'timestamp': FieldValue.serverTimestamp(),
       });
-
-      var docRef = await _firestore.collection('waiting').add({
-        'number': newNumber,
-        'status': 'waiting',
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+      if (widget.label == "Emergency") {
+        docRef = await _firestore.collection('waiting').add({
+          'number': newNumber,
+          'status': 'waiting',
+          "label": widget.label,
+          "priority": 1,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      } else {
+        docRef = await _firestore.collection('waiting').add({
+          'number': newNumber,
+          'status': 'waiting',
+          "label": widget.label,
+          "priority": 0,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      }
 
       setState(() {
         currentNumber = newNumber;
@@ -206,7 +218,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           String status = snapshot.data!['status'];
                           _isCalled = status == 'called';
-
+                          String ticketLabel = snapshot.data!['label'] ?? '';
+                          bool isUrgent = ticketLabel == 'Emergency';
                           return Column(
                             children: [
                               Text(
@@ -258,6 +271,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                             height: 100,
                                             width: 100,
                                             child: CircularProgressIndicator(),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                    if ((isUrgent)) {
+                                      return Column(
+                                        children: [
+                                          Text(
+                                            'Emergency Ticket',
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            'You must go immediately to the clinic.',
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 16,
+                                              color: Colors.grey.shade800,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ],
                                       );

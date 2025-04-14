@@ -17,9 +17,9 @@ class _MenuScreenState extends State<MenuScreen> {
 
   final List<String> labels = [
     'Consultation',
-    'Laboratoire',
-    'Urgence',
-    'Radiologie',
+  'Laboratory',
+  'Emergency',
+  'Radiology',
   ];
 
   @override
