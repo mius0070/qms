@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:qms/screens/home_screen.dart';
+import 'package:qms/screens/getServiceKey.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -8,6 +11,25 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Foreground message: ${message.notification?.title}');
+      GetServiceKey.showNotification(message);
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      GetServiceKey.showNotification(message);
+      print('Message clicked!');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MenuScreen()),
+      );
+    });
+  }
+
   final List<IconData> icons = [
     Iconsax.user_edit, // Medical consultation
     Iconsax.document_text, // Laboratory
@@ -17,14 +39,25 @@ class _MenuScreenState extends State<MenuScreen> {
 
   final List<String> labels = [
     'Consultation',
-  'Laboratory',
-  'Emergency',
-  'Radiology',
+    'Laboratory',
+    'Emergency',
+    'Radiology',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Medical Center',
+          style: GoogleFonts.roboto(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 30,
+          ),
+        ),
+        backgroundColor: Colors.blue.shade700,
+      ),
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -35,7 +68,7 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 200, 16, 16),
+          padding: const EdgeInsets.fromLTRB(16, 100, 16, 16),
           child: Column(
             children: [
               //  SizedBox(height: 150),
@@ -52,7 +85,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 'Choose one of the following options',
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 40),
               Expanded(
                 child: Center(
                   child: GridView.builder(

@@ -1,9 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:qms/screens/menu_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomeScreen extends StatefulWidget {
   final String label;
@@ -15,6 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //init recive notofication
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   int? currentNumber;
   String? _waitingDocId;
@@ -40,12 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
         'number': newNumber,
         'timestamp': FieldValue.serverTimestamp(),
       });
+      String? token = await FirebaseMessaging.instance.getToken();
+      print(token);
       if (widget.label == "Emergency") {
         docRef = await _firestore.collection('waiting').add({
           'number': newNumber,
           'status': 'waiting',
           "label": widget.label,
           "priority": 1,
+          'token': token,
           'timestamp': FieldValue.serverTimestamp(),
         });
       } else {
@@ -54,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'status': 'waiting',
           "label": widget.label,
           "priority": 0,
+          'token': token,
           'timestamp': FieldValue.serverTimestamp(),
         });
       }

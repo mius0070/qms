@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:qms/screens/getServiceKey.dart';
 
 class AdminPanel extends StatefulWidget {
   const AdminPanel({super.key});
@@ -121,7 +125,11 @@ class _AdminPanelState extends State<AdminPanel> {
       appBar: AppBar(
         title: Text(
           'Medical Center',
-          style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+          style: GoogleFonts.roboto(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 30,
+          ),
         ),
         backgroundColor: Colors.blue.shade700,
       ),
@@ -228,9 +236,17 @@ class _AdminPanelState extends State<AdminPanel> {
                           children: [
                             ElevatedButton(
                               onPressed:
-                                  _isLoading || isCalled || isCanceled
+                                  (_isLoading || isCalled || isCanceled)
                                       ? null
-                                      : () => _callNumber(number),
+                                      : () {
+                                        _callNumber(number);
+                                        GetServiceKey.sendNotificationToToken(
+                                          waitingList[index]['token'],
+                                          context,
+                                        );
+                                        // Appeler la fonction pour envoyer la notification
+                                      },
+
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue.shade700,
                               ),

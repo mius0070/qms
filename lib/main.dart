@@ -1,20 +1,29 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:qms/screens/getServiceKey.dart';
 import 'package:qms/screens/navigation_wrapper.dart';
-import 'package:qms/screens/menu_screen.dart';
-import 'package:qms/screens/display_screen.dart';
-import 'package:qms/screens/admin_panel.dart';
-import 'package:qms/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
+    WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
+ //   await FirebaseMessaging.instance.subscribeToTopic("qm");
+    await GetServiceKey.initializeLocalNotifications();
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     print('Firebase initialized successfully');
   } catch (e) {
     print('Firebase initialization failed: $e');
   }
+
   runApp(const QueueApp());
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  // No local notification needed here; system displays it
 }
 
 class QueueApp extends StatelessWidget {
