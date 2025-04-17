@@ -35,7 +35,6 @@ class QueueApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Queue Management',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         useMaterial3: true,
         fontFamily: 'Roboto',
       ),

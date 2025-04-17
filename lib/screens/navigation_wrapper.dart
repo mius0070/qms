@@ -47,7 +47,7 @@ class _NavigationWrapperState extends State<NavigationWrapper> {
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.blue.shade700,
+        selectedItemColor: Color(0xFF077C68),
         unselectedItemColor: Colors.grey,
       ),
     );

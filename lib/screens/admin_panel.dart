@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qms/screens/getServiceKey.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class AdminPanel extends StatefulWidget {
   const AdminPanel({super.key});
@@ -123,17 +123,59 @@ class _AdminPanelState extends State<AdminPanel> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Medical Center',
+          'Admin Panel',
           style: GoogleFonts.roboto(
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            fontSize: 30,
+            fontSize: 24,
           ),
         ),
-        backgroundColor: Colors.blue.shade700,
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Color(0xFF077C68),
+      ),
+      drawer: Drawer(
+        child:
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(20),
+          child: Column(children: [
+            Container(
+              width: 150,
+              child: Image.asset("images/qms_logo.png"),
+            ),
+            Center(child: Text("Queue Management System",style: GoogleFonts.roboto(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF077C68),
+              fontSize: 16,
+            ),),),
+            Divider(),
+
+            ListTile(
+              leading: Icon(Icons.policy),
+              title: Text('Privacy policy'),
+              onTap:(){
+                final url  =Uri.parse("https://www.termsfeed.com/live/382f7171-6249-4cea-9f77-a0c53ae3c8a8");
+                launchUrl(url);
+
+              },
+            ),
+            ListTile(
+                leading: Icon(Icons.copy_all_outlined),
+                title: Text('Terms and conditions'),
+                onTap: () {
+                  final url1 = Uri.parse(
+                      "https://www.termsfeed.com/live/069a8131-ccd4-499e-a0eb-345aa7da6cf4");
+                  launchUrl(url1);
+                }
+            ),
+
+          ],),
+
+        ),
+
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -155,7 +197,7 @@ class _AdminPanelState extends State<AdminPanel> {
                     style: GoogleFonts.roboto(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade700,
+                      color: Color(0xFF077C68),
                     ),
                   );
                 }
@@ -170,7 +212,7 @@ class _AdminPanelState extends State<AdminPanel> {
                   style: GoogleFonts.roboto(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade700,
+                    color: Color(0xFF077C68),
                   ),
                 );
               },
@@ -205,18 +247,22 @@ class _AdminPanelState extends State<AdminPanel> {
                       bool isCalled = status == 'called';
                       bool isCanceled = status == 'canceled';
                       return ListTile(
+
                         leading: CircleAvatar(
                           backgroundColor:
                               priority == 1
                                   ? Colors.red
-                                  : Colors.blue, // rouge si urgent
+                                  : Color(0xFF077C68), // rouge si urgent
                           child: Text(
                             '#${index + 1}',
-                          ), // numéro d'ordre dans la liste
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),), // numéro d'ordre dans la liste
                         ),
 
                         title: Text(
-                          '\nLabel: $label',
+                          '$label',
                           style: GoogleFonts.roboto(
                             fontSize: 16,
                             color: isCalled ? Colors.grey : Colors.black,
@@ -247,13 +293,12 @@ class _AdminPanelState extends State<AdminPanel> {
                                       },
 
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue.shade700,
+                                backgroundColor: Color(0xFF077C68),shape: CircleBorder(),
                               ),
-                              child: Text(
-                                'Call',
-                                style: GoogleFonts.roboto(color: Colors.white),
-                              ),
+                              child:Icon(Icons.notifications,color: Colors.white,),
+
                             ),
+
                             ElevatedButton(
                               onPressed:
                                   _isLoading || isCanceled || isCalled
@@ -261,11 +306,9 @@ class _AdminPanelState extends State<AdminPanel> {
                                       : () => _cancal(number),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
+                                shape: CircleBorder(),
                               ),
-                              child: Text(
-                                'Cancel',
-                                style: GoogleFonts.roboto(color: Colors.white),
-                              ),
+                              child:Icon(Icons.delete,color: Colors.white,),
                             ),
                           ],
                         ),
@@ -280,10 +323,10 @@ class _AdminPanelState extends State<AdminPanel> {
                 ? const Center(child: CircularProgressIndicator())
                 : ElevatedButton.icon(
                   onPressed: _resetQueue,
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(Icons.refresh,color: Colors.white,),
                   label: Text(
                     'Reset Queue',
-                    style: GoogleFonts.roboto(fontSize: 16),
+                    style: GoogleFonts.roboto(fontSize: 16,color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
