@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qms/screens/getServiceKey.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -178,7 +175,7 @@ class _AdminPanelState extends State<AdminPanel> {
 
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -265,7 +262,7 @@ class _AdminPanelState extends State<AdminPanel> {
                         ),
 
                         title: Text(
-                          '\nLabel: $label',
+                          '$label',
                           style: GoogleFonts.roboto(
                             fontSize: 16,
                             color: isCalled ? Colors.grey : Colors.black,
@@ -296,12 +293,10 @@ class _AdminPanelState extends State<AdminPanel> {
                                       },
 
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF077C68),
+                                backgroundColor: Color(0xFF077C68),shape: CircleBorder(),
                               ),
-                              child: Text(
-                                'Call',
-                                style: GoogleFonts.roboto(color: Colors.white),
-                              ),
+                              child:Icon(Icons.notifications,color: Colors.white,),
+
                             ),
 
                             ElevatedButton(
@@ -311,11 +306,9 @@ class _AdminPanelState extends State<AdminPanel> {
                                       : () => _cancal(number),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
+                                shape: CircleBorder(),
                               ),
-                              child: Text(
-                                'Cancel',
-                                style: GoogleFonts.roboto(color: Colors.white),
-                              ),
+                              child:Icon(Icons.delete,color: Colors.white,),
                             ),
                           ],
                         ),
