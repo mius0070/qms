@@ -51,7 +51,7 @@ dependencies:
   googleapis_auth: ^2.0.0
   app_settings: ^6.1.1
   flutter_local_notifications: ^19.1.0
-  cloud_functions: ^4.7.6
+  marquee: ^2.3.0
   
   
 
