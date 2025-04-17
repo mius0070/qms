@@ -130,10 +130,10 @@ class _AdminPanelState extends State<AdminPanel> {
             fontSize: 24,
           ),
         ),
+        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Color(0xFF077C68),
       ),
       drawer: Drawer(
-
         child:
         Container(
           width: double.infinity,
