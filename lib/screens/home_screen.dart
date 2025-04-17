@@ -142,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.blue.shade700, Colors.blue.shade300],
+            colors: [Color(0xFF077C68), Color(0xFF077C6e)],
           ),
         ),
         child: SafeArea(
@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: GoogleFonts.roboto(
                                     fontSize: 48,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.blue.shade900,
+                                    color: Color(0xFF077C68),
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -233,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 'Your Number',
                                 style: GoogleFonts.roboto(
                                   fontSize: 24,
-                                  color: Colors.blue.shade700,
+                                  color: Color(0xFF077C68),
                                 ),
                               ),
                               const SizedBox(height: 10),
@@ -242,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: GoogleFonts.roboto(
                                   fontSize: 48,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blue.shade900,
+                                  color: Color(0xFF077C68),
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -369,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               style: GoogleFonts.roboto(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.blue.shade900,
+                                                color: Color(0xFF077C68),
                                               ),
                                             ),
                                           ],
@@ -383,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       )
                     else if (_isLoading)
-                      const SpinKitCircle(color: Colors.blue)
+                      const SpinKitCircle(color: Color(0xFF077C68))
                     else
                       Text(
                         'Take a number',
@@ -405,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           backgroundColor:
-                              _hasTakenNumber ? Colors.grey : Colors.blue,
+                              _hasTakenNumber ? Colors.grey : Color(0xFF077C68),
                         ),
                         child: Text(
                           _hasTakenNumber ? 'Number Taken' : 'Take Number',
