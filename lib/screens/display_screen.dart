@@ -10,7 +10,7 @@ class DisplayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF077C6e), // Green background as in the image
+      backgroundColor: Colors.white, // Green background as in the image
       body: SafeArea(
         child: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
@@ -52,6 +52,7 @@ class DisplayScreen extends StatelessWidget {
               children: [
                 // Header with logo and title
                 Container(
+
                   padding: const EdgeInsets.all(8.0),
                   color: Colors.white,
                   child: Row(
@@ -77,16 +78,67 @@ class DisplayScreen extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: Center(
-                    child: Text(
-                      '$currentCalledNumber',
-                      style: GoogleFonts.roboto(
-                        fontSize: 150,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          margin:const EdgeInsets.only(left: 10.0,right: 10.0) ,
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10.0),),
+                            color: Color(0xFF077C6e),
+                          ),
+                          child: Text(
+                            'Ticket N°',
+                            style: GoogleFonts.roboto(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10.0),
+                        Container(
+                          margin:const EdgeInsets.only(left: 10.0,right: 10.0) ,
+                          alignment: Alignment.center,
+                          width: double.infinity,
+
+                          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10.0),),
+                          color: Color(0xFF077C6e),
+                           ),
+                          child: Text(
+                            '$currentCalledNumber',
+                            style: GoogleFonts.roboto(
+                              fontSize: 160,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+                SizedBox(height: 10.0,),
+                Container(
+                  margin:const EdgeInsets.only(left: 10.0,right: 10.0) ,
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5.0),),
+                    color: Color(0xFF077C6e),
+                  ),
+
+                  child:  Text(
+                    'Number of waiting',
+                    style: GoogleFonts.roboto(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.0,),
+
                 // Waiting info by label in a row-column layout
                 StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
@@ -151,9 +203,12 @@ class DisplayScreen extends StatelessWidget {
                         }
 
                         return Container(
-                          width: double.infinity,
+                          margin:const EdgeInsets.only(left: 10.0,right: 10.0) ,
                           alignment: Alignment.center,
-                          color: Colors.white,
+                          width: double.infinity,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10.0),),
+                            color: Color(0xFF077C6e),
+                          ),
                           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                           child: Wrap(
                             spacing: 20, // Space between items horizontally
@@ -167,7 +222,7 @@ class DisplayScreen extends StatelessWidget {
                                     style: GoogleFonts.roboto(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                      color: Colors.white,
                                     ),
                                   ),
                                   const SizedBox(height: 5),
@@ -176,7 +231,7 @@ class DisplayScreen extends StatelessWidget {
                                     style: GoogleFonts.roboto(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ],
@@ -188,27 +243,22 @@ class DisplayScreen extends StatelessWidget {
                     );
                   },
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 40,
-                    color: Colors.teal.shade800,
-                    child: Marquee(
-                      text: '🏥 Centre Médical    •   Adresse : 12 rue des sciences   •   Horaires : 8h – 18h   •   📞 0555 66 77 88   ',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      velocity: 40,
-                      blankSpace: 60,
-                      pauseAfterRound: const Duration(seconds: 1),
-                      showFadingOnlyWhenScrolling: true,
-                      fadingEdgeStartFraction: 0.05,
-                      fadingEdgeEndFraction: 0.05,
+                SizedBox(height: 10,),
+                Container(
+                  height: 40,
+                  color: Color(0xFF077C6e),
+                  child: Marquee(
+                    text: '🏥 Centre Médical    •   Adresse : 12 rue des sciences   •   Horaires : 8h – 18h   •   📞 0555 66 77 88   ',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
                     ),
+                    velocity: 40,
+                    blankSpace: 60,
+                    showFadingOnlyWhenScrolling: true,
+                    fadingEdgeStartFraction: 0.05,
+                    fadingEdgeEndFraction: 0.05,
                   ),
                 ),
               ],
